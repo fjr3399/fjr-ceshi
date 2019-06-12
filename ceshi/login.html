@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="../js/jquery-1.9.1.min.js"></script>
+		<style type="text/css">
+			button:hover,a:hover{
+				cursor: pointer;
+				color: red;
+			}
+		</style>
+	</head>
+	<body>
+		<h3>登录</h3>
+		<div>账号：<input type="text" id="username"></div>
+		<div>密码：<input type="password" id="password"></div>
+		<button id="btn">登录</button>
+		<br />
+		<br />
+		<br />
+		<div style="display: inline-block;"><a >注册账号</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<div style="display: inline-block;"><a id="btn3">注销账号</a></div>
+		<br />
+		<br />
+		<br />
+		<br />
+		<h3>注册</h3>
+		<div>账号：<input type="text" id="username1"></div>
+		<div>密码：<input type="password" id="password1"></div>
+		<div>邮箱：<input type="text" id="email"></div>
+		<div>手机：<input type="text" id="phone"></div>
+		<button id="btn2">获取验证码</button>
+		验证码：<input type="text" id="yzm" />
+		<button id="btn1">注册</button>
+		<br />
+		<br />
+		<br />
+		<h3>手机号登录</h3>
+		<div>手机号：<input id="phone1"></div>
+		<div><button id="btn4">验证码：</button><input type="text" id="code"></div>
+		<button id="btn-phone">登录</button>
+	</body>
+	<script>
+		
+		var storage=window.localStorage;
+								
+		var baseurl = "https://test.52hbl.com";
+//		登录
+		$("#btn").click(function(){
+			var use = $("#username").val();
+			var pas = $("#password").val();
+			 $.ajax({
+                type: "post",
+                url: baseurl+'/index.php/index/wxapp.login/simple',
+                data: {
+                	username:use,
+                	password:pas
+                },
+				success: function (data){
+					console.log(data)
+					console.log(data.msg)
+					 if(data.msg=="登录成功"){
+						alert("登录成功");
+						console.log(data.data.uid)
+						  storage.setItem("uid",data.data.uid);
+						location.href="index.html"
+					}
+				}
+            });
+		})
+//		获取验证码
+		$("#btn2").click(function(){
+			var pho = $("#phone").val();
+			if(pho.length==0){
+				alert("请填写手机号")
+				return false;
+			}
+			console.log(pho)
+			 $.ajax({
+                type: "post",
+                url: baseurl+'/index.php/index/wxapp.login/get_phone_num',
+                data: {
+                	phone:pho
+                },
+				success: function (data){
+					console.log(data)
+					
+				}
+            });
+		})
+//		注册/
+		$("#btn1").click(function(){
+			var use = $("#username1").val();
+			var pas = $("#password1").val();
+			var ema = $("#email").val();
+			var pho = $("#yzm").val();
+			if(use.length==0){
+				alert("请填写用户名")
+				return false;
+			}
+			if(pas.length==0){
+				alert("请填写密码")
+				return false;
+			}
+			if(ema.length==0){
+				alert("请填写邮箱")
+				return false;
+			}
+			if(pho.length==0){
+				alert("请填写手机号")
+				return false;
+			}
+			 $.ajax({
+                type: "post",
+                url: baseurl+'/index.php/index/wxapp.login/phone_reg',
+                data: {
+                	username:use,
+                	password:pas,
+                	email:ema,
+                	phone_code:pho
+                },
+				success: function (data){
+					console.log(data)
+					if(data.msg=="登录成功"){
+						alert("注册成功")
+						storage.setItem("uid",data.data.uid);
+					}
+				}
+            });
+		})
+		//注销
+		$("#btn3").click(function(){
+			var uid = storage.getItem("uid");console.log(uid)
+			var use = $("#username1").val();
+			var pas = $("#password1").val();
+			var ema = $("#email").val();
+			var pho = $("#yzm").val();
+			 $.ajax({
+                type: "get",
+                url: baseurl+'/index.php/index/wxapp.login/quitweb',
+                data: {
+                	uid:uid
+                },
+				success: function (data){
+					console.log(data)
+					if(data.data=="退出成功");
+					alert("退出成功")
+					storage.clear()
+				}
+            });
+		})
+		//获取验证码
+		$("#btn4").click(function(){
+			var pho = $("#phone1").val();
+			if(pho.length==0){
+				alert("请填写手机号")
+				return false;
+			}
+			console.log(pho)
+			 $.ajax({
+                type: "post",
+                url: baseurl+'/index.php/index/wxapp.login/get_phone_num',
+                data: {
+                	phone:pho
+                },
+				success: function (data){
+					console.log(data)
+					
+				}
+            });
+		})
+		//手机号登录
+		$("#btn-phone").click(function(){
+			var num = $("#code").val();
+			if(num.length==0){
+				alert("请填写验证码")
+				return false;
+			}
+			 $.ajax({
+                type: "post",
+                url: baseurl+'/index.php/index/wxapp.login/check_phone_num',
+                data: {
+                	num:num
+                },
+				success: function (data){
+					console.log(data)
+					storage.setItem("uid",data.data.uid);
+					location.href="index.html"
+				}
+            });
+		})
+	</script>
+</html>
